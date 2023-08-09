@@ -11,6 +11,7 @@ from datetime import datetime
 # TODO: Import required libraries for App Insights
 from opencensus.ext.flask.flask_middleware import FlaskMiddleware
 from opencensus.ext.azure.log_exporter import AzureLogHandler
+from opencensus.ext.azure.log_exporter import AzureEventHandler
 from opencensus.ext.azure import metrics_exporter
 from opencensus.ext.azure.trace_exporter import AzureExporter
 
@@ -27,6 +28,7 @@ from opencensus.tags import tag_map as tag_map_module
 # Logging
 logger = logging.getLogger(__name__)
 logger.addHandler(AzureLogHandler(connection_string='InstrumentationKey=18858ef1-c50d-4961-97a9-6e0f6a382c0b'))
+logger.addHandler(AzureEventHandler(connection_string='InstrumentationKey=18858ef1-c50d-4961-97a9-6e0f6a382c0b'))
 
 # Metrics
 exporter = metrics_exporter.new_metrics_exporter(
@@ -104,12 +106,12 @@ def index():
             vote1 = r.get(button1).decode('utf-8')
             properties = {'custom_dimensions': {'Cats Vote': vote1}}
             # TODO: use logger object to log cat vote
-            app.logger.warning('Cats', extra=properties)
+            logger.warning('Cats', extra=properties)
 
             vote2 = r.get(button2).decode('utf-8')
             properties = {'custom_dimensions': {'Dogs Vote': vote2}}
             # TODO: use logger object to log dog vote
-            app.logger.warning('Dogs', extra=properties)
+            logger.warning('Dogs', extra=properties)
             return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
 
         else:
@@ -121,11 +123,11 @@ def index():
             # Get current values
             vote1 = r.get(button1).decode('utf-8')
             properties = {'custom_dimensions': {'Cats Vote': vote1}}
-            app.logger.info('Cats Vote', extra=properties)
+            logger.info('Cats Vote', extra=properties)
 
             vote2 = r.get(button2).decode('utf-8')
             properties = {'custom_dimensions': {'Dogs Vote': vote2}}
-            app.logger.info('Dogs Vote', extra=properties) 
+            logger.info('Dogs Vote', extra=properties) 
             # Return results
             return render_template("index.html", value1=int(vote1), value2=int(vote2), button1=button1, button2=button2, title=title)
 
